@@ -819,6 +819,7 @@ ja:
   label_parent_revision: 親
   label_child_revision: 子
   label_gantt_progress_line: イナズマ線
+  label_regexp: 正規表現
 
   button_login: ログイン
   button_submit: 送信

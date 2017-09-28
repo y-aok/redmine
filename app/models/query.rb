@@ -262,6 +262,7 @@ class Query < ActiveRecord::Base
     "!p"  => :label_no_issues_in_project,
     "*o"  => :label_any_open_issues,
     "!o"  => :label_no_open_issues
+    "r"   => :label_regexp
   }
 
   class_attribute :operators_by_filter_type
@@ -272,8 +273,8 @@ class Query < ActiveRecord::Base
     :list_subprojects => [ "*", "!*", "=", "!" ],
     :date => [ "=", ">=", "<=", "><", "<t+", ">t+", "><t+", "t+", "t", "ld", "w", "lw", "l2w", "m", "lm", "y", ">t-", "<t-", "><t-", "t-", "!*", "*" ],
     :date_past => [ "=", ">=", "<=", "><", ">t-", "<t-", "><t-", "t-", "t", "ld", "w", "lw", "l2w", "m", "lm", "y", "!*", "*" ],
-    :string => [ "=", "~", "!", "!~", "!*", "*" ],
-    :text => [  "~", "!~", "!*", "*" ],
+    :string => [ "=", "~", "!", "!~", "!*", "*", "r" ],
+    :text => [  "~", "!~", "!*", "*", "r" ],
     :integer => [ "=", ">=", "<=", "><", "!*", "*" ],
     :float => [ "=", ">=", "<=", "><", "!*", "*" ],
     :relation => ["=", "=p", "=!p", "!p", "*o", "!o", "!*", "*"],
@@ -1205,6 +1206,8 @@ class Query < ActiveRecord::Base
       sql = sql_contains("#{db_table}.#{db_field}", value.first)
     when "!~"
       sql = sql_contains("#{db_table}.#{db_field}", value.first, false)
+    when "r"
+      sql = "LOWER(#{db_table}.#{db_field}) REGEXP '#{connection.quote_string(value.first.to_s.downcase)}'"
     else
       raise "Unknown query operator #{operator}"
     end
